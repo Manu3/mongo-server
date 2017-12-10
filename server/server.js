@@ -1,3 +1,4 @@
+const {MongoClient,ObjectID}  = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-Parser');
 
@@ -26,6 +27,29 @@ app.post('/users', (req,res) =>{
         res.status(400).send(err);
       });
     });
+    //GET users/id
+    app.get('/users/:id',(req,res) => {
+        var id = req.params.id;
+        if(!ObjectID.isValid(id)){
+          return res.status(404).send('Invalid Id');
+        }else{
+          Users.findOne({
+            _id:id
+          }).then((newUser) => {
+            if(!newUser){
+              res.status(404).send('Not found');
+            }else{
+              // to get complete object
+              res.send({newUser});
+              // to get id
+            //  res.send( req.params);
+            }
+          });
+        }
+      //  res.send(req.params);
+    });
+
+
   app.listen(9090, () => {
     console.log('server is up on 9090');
   });
