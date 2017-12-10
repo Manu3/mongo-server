@@ -6,6 +6,7 @@ var{mongoose} = require('./db/mongoose');
 var{Users} = require('./models/users');
 
 var app = express();
+var port = process.env.PORT || 9090;
 
 app.use(bodyParser.json());
 
@@ -50,8 +51,8 @@ app.post('/users', (req,res) =>{
     });
 
 
-  app.listen(9090, () => {
-    console.log('server is up on 9090');
+  app.listen(port, () => {
+    console.log(`started at port: ${port}`);
   });
 
   module.exports = {app};
