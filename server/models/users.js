@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 var Users = mongoose.model('Users',{
   name:{
-    type:String
+    type:String,
+    minlength:5,
+    required: true,
+    trim:true
   },
   address:{
     type:String,
