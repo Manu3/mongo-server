@@ -4,6 +4,7 @@ const {
 } = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-Parser');
+const _ = require('lodash');
 var {
     mongoose
 } = require('./db/mongoose');
@@ -16,15 +17,40 @@ var port = process.env.PORT || 9090;
 
 app.use(bodyParser.json());
 
+// app.post('/users', (req, res) => {
+//     var newUser = new Users({
+//         name: req.body.name
+//     });
+//     newUser.save().then((doc) => {
+//         res.send(doc);
+//     }, (e) => {
+//         res.status(400).send(e);
+//     });
+// });
+
+
+//<<<<------ this is to validate the email and password from users model---->>>>
+// app.post('/users', (req, res) => {
+//   var body = _.pick(req.body, ['name', 'email', 'password']);
+//   var user = new Users(body);
+//
+//   user.save().then((user) => {
+//           res.send(user);
+//       }).catch((e) => {
+//           res.status(400).send(e);
+//       });
+// });
+
 app.post('/users', (req, res) => {
-    var newUser = new Users({
-        name: req.body.name
-    });
-    newUser.save().then((doc) => {
-        res.send(doc);
-    }, (e) => {
-        res.status(400).send(e);
-    });
+  var body = _.pick(req.body, ['name', 'email', 'password']);
+  var user = new Users(body);
+  user.save().then(() => {
+      return user.generateAuthToken();
+    }).then((token) => {
+      res.header('x-auth', token).send(user);
+    }).catch((e) => {
+      res.status(400).send(e);
+    })
 });
 
 app.listen(port, () => {

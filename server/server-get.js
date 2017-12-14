@@ -10,7 +10,7 @@ var {
 var {
     Users
 } = require('./models/users');
-
+var {authenticate} = require('./middleware/authenticate');
 var app = express();
 var port = process.env.PORT || 9090;
 
@@ -28,27 +28,36 @@ app.get('/users', (req, res) => {
     });
 });
 //GET users/id
-app.get('/users/:id', (req, res) => {
-    var id = req.params.id;
-    if (!ObjectID.isValid(id)) {
-        return res.status(404).send('Invalid Id');
-    } else {
-        Users.findOne({
-            _id: id
-        }).then((newUser) => {
-            if (!newUser) {
-                res.status(404).send('Not found');
-            } else {
-                // to get complete object
-                res.send({
-                    newUser
-                });
-                // to get id
-                //  res.send( req.params);
-            }
-        });
-    }
+// app.get('/users/:id', (req, res) => {
+//     var id = req.params.id;
+//     if (!ObjectID.isValid(id)) {
+//         return res.status(404).send('Invalid Id');
+//     } else {
+//         Users.findOne({
+//             _id: id
+//         }).then((newUser) => {
+//             if (!newUser) {
+//                 res.status(404).send('Not found');
+//             } else {
+//                 // to get complete object
+//                 res.send({
+//                     newUser
+//                 });
+//                 // to get id
+//                 //  res.send( req.params);
+//             }
+//         });
+//     }
+// });
+
+// GET Private route <<<<--Authentication-->>>> users/me
+
+
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
+
+
 app.listen(port, () => {
     console.log(`started at port: ${port}`);
 });
