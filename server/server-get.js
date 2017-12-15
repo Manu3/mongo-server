@@ -16,8 +16,6 @@ var port = process.env.PORT || 9090;
 
 app.use(bodyParser.json());
 
-
-
 app.get('/users', (req, res) => {
     Users.find().then((users) => {
         res.send({
