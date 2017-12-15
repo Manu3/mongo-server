@@ -122,5 +122,19 @@ UserSchema.statics.findByCredentials = function (email, password){
   });
 };
 
+///<<<<<<<<------------remove token --- logout --------------->>>>>>>>>
+
+UserSchema.methods.removeToken = function (token){
+  var user = this;
+  return user.update({
+    $pull:{
+      tokens:{
+        token
+      }
+    }
+  });
+};
+
+
 var Users = mongoose.model('Users', UserSchema);
 module.exports = {Users};
