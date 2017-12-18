@@ -11,11 +11,14 @@ var {
 var {
     Users
 } = require('./models/users');
-
+var {Todo} = require('./models/todo');
+var {authenticate} = require('./middleware/authenticate');
 var app = express();
 var port = process.env.PORT || 9090;
 
 app.use(bodyParser.json());
+
+
 
 // app.post('/users', (req, res) => {
 //     var newUser = new Users({

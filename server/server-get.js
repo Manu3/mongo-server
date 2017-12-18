@@ -10,11 +10,14 @@ var {
 var {
     Users
 } = require('./models/users');
+var {Todo} = require('./models/todo');
 var {authenticate} = require('./middleware/authenticate');
 var app = express();
 var port = process.env.PORT || 9090;
 
 app.use(bodyParser.json());
+
+
 
 app.get('/users', (req, res) => {
     Users.find().then((users) => {
@@ -26,27 +29,27 @@ app.get('/users', (req, res) => {
     });
 });
 //GET users/id
-// app.get('/users/:id', (req, res) => {
-//     var id = req.params.id;
-//     if (!ObjectID.isValid(id)) {
-//         return res.status(404).send('Invalid Id');
-//     } else {
-//         Users.findOne({
-//             _id: id
-//         }).then((newUser) => {
-//             if (!newUser) {
-//                 res.status(404).send('Not found');
-//             } else {
-//                 // to get complete object
-//                 res.send({
-//                     newUser
-//                 });
-//                 // to get id
-//                 //  res.send( req.params);
-//             }
-//         });
-//     }
-// });
+app.get('/users/:id', (req, res) => {
+    var id = req.params.id;
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send('Invalid Id');
+    } else {
+        Users.findOne({
+            _id: id
+        }).then((newUser) => {
+            if (!newUser) {
+                res.status(404).send('Not found');
+            } else {
+                // to get complete object
+                res.send({
+                    newUser
+                });
+                // to get id
+                //  res.send( req.params);
+            }
+        });
+    }
+});
 
 // GET Private route <<<<--Authentication-->>>> users/me
 

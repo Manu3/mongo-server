@@ -19,7 +19,9 @@ var UserSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
-//<<<<------ this is to validate the email and password from users model---->>>>
+/*
+<<<<------ this is to validate the email and password from users model---->>>>
+*/
   email:{
       type:String,
       required: true,
@@ -47,11 +49,15 @@ var UserSchema = new mongoose.Schema({
     }
   }]
 });
+
+/*
+<<<<-----GET/users------>>>>>>>
+*/
 UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
-
-  return _.pick(userObject, ['name', '_id', 'email']);
+  console.log(JSON.stringify(userObject));
+  return _.pick(userObject, ['name', '_id', 'email','completedAt','password','tokens']);
 };
 
 UserSchema.methods.generateAuthToken = function (){
@@ -65,7 +71,7 @@ UserSchema.methods.generateAuthToken = function (){
     return token;
   });
 };
-//<<<<-----Find token------>>>>>>>//////
+//<<<<-----Find by token------>>>>>>>//////
 UserSchema.statics.findByToken = function (token) {
   var User = this;
   var decoded;
