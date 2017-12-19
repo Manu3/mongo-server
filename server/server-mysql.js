@@ -1,58 +1,70 @@
 var mysql = require('mysql');
 var express = require('express');
 var app = express();
-var bodyParser = require('body-Parser');
-var con = mysql.createConnection({
+const bodyParser = require('body-parser').json();
+var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
   database: "testnode"
 });
 
-//create TABLE --->
+connection.connect();
 
-// con.connect(function(err) {
-//   if (err) throw err;
-//   console.log("Connected!");
-//   /*Create a table named "customers":*/
-//   var sql = "CREATE TABLE newcustomers (name VARCHAR(255), address VARCHAR(255))";
-//   con.query(sql, function (err, result) {
-//     if (err) throw err;
-//     console.log("Table created");
-//   });
-// });
+app.set('view engine', 'pug');
 
-//Insert into table ---->
+app.get('/users', bodyParser, function(req, res) {
+	connection.query('SELECT * FROM users', function(err, row, fields) {
+	  	if (err) {
+        console.log(err);
+	  		return res.status(500).json({"status_code": 500,"status_message": "internal server error"});
 
-// con.connect(function(err) {
-//   if (err) throw err;
-//   console.log("Connected!");
-//   //Insert a record in the "customers" table:
-//   var sql = "INSERT INTO newcustomers (name, address) VALUES ('Company Inc', 'Highway 37')";
-//   con.query(sql, function (err, result) {
-//     if (err) throw err;
-//     console.log("1 record inserted");
-//   });
-// });
-
-//read data   ----->
-
-con.connect(function(err) {
-  if (err) throw err;
-  con.query("SELECT * FROM newcustomers", function (err, result, fields) {
-    if (err) throw err;
-    console.log(result);
-  });
+	  	} else {
+        //for sending the reponse.
+        res.send(row);
+      }
+	});
+//  connection.end();
 });
 
-app.get('/users', (req, res) => {
-    Users.find().then((users) => {
-        res.send({
-            users
-        });
-    }, (err) => {
-        res.status(400).send(err);
-    });
+app.get('/users/:id', function (req, res) {
+   connection.query('select * from users where id=?', [req.params.id],
+   function (err, results, fields) {
+   if (err) throw err;
+   res.end(JSON.stringify(results));
+ });
+});
+
+app.post('/users', bodyParser, function (req, res, next) {
+    connection.query('INSERT INTO users SET ?', req.body,
+        function (err, results, fields) {
+            if (err) throw err;
+            res.send('User added to database with ID: ' + results.id);
+            console.log(results);
+        }
+    );
+    //connection.end();
+});
+
+//update
+app.put('/users', bodyParser, function (req, res, next) {
+     connection.query('UPDATE `users` SET `name`=?,`address`=? where `id`=?', [req.body.name,req.body.address, req.body.id],
+        function (err, results, fields) {
+            if (err) throw err;
+            res.end(JSON.stringify(results));
+            console.log(JSON.stringify(results));
+        }
+    );
+    //connection.end();
+});
+
+//
+app.delete('/users/:id', function (req, res) {
+   connection.query('DELETE FROM `users` WHERE `id`=?', [req.params.id],
+   function (err, results, fields) {
+    if (err) throw err;
+    res.end('Record has been deleted!');
+  });
 });
 app.listen(9090, () => {
     console.log(`started at port: ${9090}`);
