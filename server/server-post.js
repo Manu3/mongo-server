@@ -4,6 +4,7 @@ const {
 } = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-Parser');
+var path = require('path');
 const _ = require('lodash');
 var {
     mongoose
@@ -16,6 +17,10 @@ var {authenticate} = require('./middleware/authenticate');
 var app = express();
 var port = process.env.PORT || 9090;
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 

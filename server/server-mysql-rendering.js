@@ -1,7 +1,8 @@
 var mysql = require('mysql');
 var express = require('express');
 var app = express();
-const bodyParser = require('body-parser').json();
+var path = require('path');
+var bodyParser = require('body-parser');
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -11,42 +12,69 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-app.set('view engine', 'pug');
+//app.set('view engine', 'pug');
 
-app.get('/users', bodyParser, function(req, res) {
-	var userList = [];
-	// Connect to MySQL database.
-	// Do the query to get data.
-	connection.query('SELECT * FROM users', function(err, row, fields) {
-	  	if (err) {
-	  		res.status(500).json({"status_code": 500,"status_message": "internal server error"});
-	  	} else {
-        //for sending the reponse.
-        //res.send(row);
-        //console.log(JSON.stringify(row));
-	  		// Loop check on each row
-        /*
-        for rendering the oug template--->>>
-        */
-	  		for (var i = 0; i < row.length; i++) {
+//view engine
 
-	  			// Create an object to save current row's data
-		  		var users = {
-            'id':row[i].id,
-		  			'name':row[i].name,
-		  			'address':row[i].address
-		  		}
-		  		// Add object into array
-		  		userList.push(users);
-	  	}
-	  	res.render('index', {"userList": userList});
-	  	}
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+app.get('/users', function(req, res) {
+    var userList = [];
+    connection.query('SELECT * FROM users', function(err, row, fields) {
+        if (err) {
+            res.status(500).json({
+                "status_code": 500,
+                "status_message": "internal server error"
+            });
+        } else {
+            //for sending the reponse.
+            console.log(JSON.stringify(row));
+            // Loop check on each row
+            /*for rendering the oug template--->>> */
+            for (var i = 0; i < row.length; i++) {
+
+                // Create an object to save current row's data
+                var users = {
+                    'id': row[i].id,
+                    'name': row[i].name,
+                    'address': row[i].address
+                }
+                // Add object into array
+                userList.push(users);
+            }
+            res.render('index', {
+                title: 'Customers List',
+                "userList": userList
+            });
+        }
         // Close the MySQL connection
-      	connection.end();
-	});
+        //connection.end();
+    });
 });
 
+app.post('/users', function(req, res, next) {
+  var input = JSON.parse(JSON.stringify(req.body));
+  var newUser = {
+      name: input.name,
+      address: input.address
+  }
+  console.log('New user is', newUser);
+  connection.query('INSERT INTO users SET ?', newUser,
+      function(err, results, fields) {
+          if (err) {
+              console.log(err);
+          } else {
+              res.redirect('/users');
+          }
 
+      }
+  );
+  //connection.end();
+});
 
 
 //create TABLE --->

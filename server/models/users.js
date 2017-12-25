@@ -6,7 +6,6 @@ const bcrypt = require('bcryptjs');
 var UserSchema = new mongoose.Schema({
   name:{
     type:String,
-    minlength:5,
     required: true,
     trim:true
   },
@@ -18,6 +17,10 @@ var UserSchema = new mongoose.Schema({
   completedAt:{
     type: Number,
     default: null
+  },
+  message:{
+    type:String,
+      required: true,
   },
 /*
 <<<<------ this is to validate the email and password from users model---->>>>
@@ -35,7 +38,6 @@ var UserSchema = new mongoose.Schema({
   },
   password:{
     type:String,
-    required: true,
     minlength:5
   },
   tokens:[{
